@@ -10,15 +10,28 @@
 
 ## Usage
 
-### ~~线路查询~~ (已废弃)
+### 线路查询 (修理版，之后和何大佬一起讨论弄一个pull request)
 
 ```
->>> import shbus.lineinfo
->>> basic_info = shbus.lineinfo.LineInfo('江川7路')
->>> print(basic_info)
-Bus
-东川路地铁站 交通大学(闵行校区) 06:00 20:30
-交通大学(闵行校区) 东川路地铁站 06:10 20:40
+from shbus import realtime, LineSequence
+# Direction 代表上下行，默认为上行（方向=0），83路为例子，长清北路枢纽站往三林世博家园为下行，所以为routes[1], 反方向为上行，所以改routes[0]
+response = realtime.get_realtime_bus([LineSequence(line='83路', info=True)])
+
+print(response[0].info.routes[1].time.early)
+print(response[0].info)
+print("上行站点：")
+for name in response[0].info.routes[0].names:
+    print(name)
+
+print()
+
+print("下行站点：")
+for name in response[0].info.routes[1].names:
+    print(name)
+
+print("首末班车如下：")
+print(response2[0].info.routes[0].names[0] + " -> " + response2[0].info.routes[0].names[len(response2[0].info.routes[0].names) - 1] + ": " + response2[0].info.routes[0].time.early + " " + response2[0].info.routes[0].time.late)
+print(response2[0].info.routes[1].names[0] + " -> " + response2[0].info.routes[1].names[len(response2[0].info.routes[1].names) - 1] + ": " + response2[0].info.routes[1].time.early + " " + response2[0].info.routes[1].time.late)
 ```
 
 ### 实时公交
@@ -51,41 +64,39 @@ Bus
     
     是经过 AES CBC 加密的 Protobuf 结构化消息。解析起来有两个难点：如何找到 AES 的加密秘钥和初始向量；以及如何构造 Protobuf 消息的结构。这里不多赘述。
 
-### ~~线路查询~~ (已废弃)
+### 线路查询
 
 「上海公交」的线路查询功能共有3个接口：
 
-1. 搜索接口:
-    `http://lbs.jt.sh.cn:8088/linePrompt`
+1. 搜索接口 （需要进行修改，原理是采用AES，和实时公交查询使用的URL一致）:
+    `[http://lbs.jt.sh.cn:8082/app/rls/monitor](http://lbs.jt.sh.cn:8082/app/rls/monitor)`
 
-    用于模糊查询公交线路名称。例如：`http://lbs.jt.sh.cn:8088/lineInfo?name=132`
-    
-    接口返回的数据需要先经过 base64 解码，如果返回的线路列表长度大于1，则需要再使用 zlib 解压缩，否则无需进一步处理。
-    
-    对于上一步返回的数据，需要逐字节解析：
-    
-    - 先读取一个整型，代表线路列表的长度 n
-    - 再根据上一步获取的长度，连续读取 n 个字符串，即得线路列表
-
-2. 线路基本信息:
-    `http://lbs.jt.sh.cn:8088/lineInfo`
+2. 线路信息，查询首末班车，起点站和终点站:
+    使用实时公交查询链接，实时公交查询连接如果能进行post并返还成功后，定义resposnse如下：
+    response = realtime.get_realtime_bus([LineSequence(line='83路', info=True)])
     
     用于查询线路的始末站以及首末班车时间。
+    上行起点站（83路为例，是三林世博家园）： print(response[0].info.routes[0].names[0])
+    上行终点站（83路为例，是长清北路枢纽站）： print(response[0].info.routes[0].names[len(response[0].info.routes[0].names) - 1])
+    下行起点站（83路为例，是长清北路地铁站）： print(response[0].info.routes[1].names[0])
+    下行终点站（83路为例，是三林世博家园）： print(response[0].info.routes[1].names[len(response[0].info.routes[1].names) - 1)
     
-    接口返回的数据同样需要经过 base64 解码后使用 zlib 解压缩。
-    
-    数据解析:
-    
-    - 先读取1个字节，代表该线路的类型 (0: 公交, 1: 地铁, 2: 轮渡)
-    - 随后读取4个字符串，分别是：上行起始站、上行终点站、上行首班车时间、上行末班车时间。
-    - 如果此时还有数据未读，则再读4个字符串，作为下行的信息。
-
-3. 线路详细信息:
-    `http://lbs.jt.sh.cn:8088/lineDetail`
-    
-    返回一条线路上行或下行的所有站点以及其位置。
-    
-    原理与上述类似，具体参见代码。
+    上行（83路为例，三林世博家园发往长清北路枢纽站），所有站点代码如下：
+    for name in response[0].info.routes[0].names:
+        print(name)
+    下行（83路为例，长清北路枢纽站发往三林世博家园），所有站点代码如下：
+    for name in response[0].info.routes[1].names:
+        print(name)
+   
+    上行首班车，末班车，下行首班车，末班车代码如下：
+    print(response[0].info.routes[0].time.early)
+    print(response[0].info.routes[0].time.late)
+    print(response[0].info.routes[1].time.early)
+    print(response[0].info.routes[1].time.late)
+    6:00
+    20:30
+    6:30
+    21:00
 
 ### 实时公交查询
 
