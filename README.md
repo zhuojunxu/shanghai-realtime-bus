@@ -86,7 +86,7 @@ print(response2[0].info.routes[1].names[0] + " -> " + response2[0].info.routes[1
    ```
    print(response[0].info.routes[0].names[len(response[0].info.routes[0].names) - 1])
    ```
-    下行起点站（83路为例，是长清北路地铁站）：
+    下行起点站（83路为例，是长清北路枢纽站）：
    ```
    print(response[0].info.routes[1].names[0])
    ```
