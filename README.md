@@ -73,30 +73,34 @@ print(response2[0].info.routes[1].names[0] + " -> " + response2[0].info.routes[1
 
 2. 线路信息，查询首末班车，起点站和终点站:
     使用实时公交查询链接，实时公交查询连接如果能进行post并返还成功后，定义resposnse如下：
+    ```
     response = realtime.get_realtime_bus([LineSequence(line='83路', info=True)])
+    ```
     
     用于查询线路的始末站以及首末班车时间。
-    上行起点站（83路为例，是三林世博家园）： print(response[0].info.routes[0].names[0])
-    上行终点站（83路为例，是长清北路枢纽站）： print(response[0].info.routes[0].names[len(response[0].info.routes[0].names) - 1])
-    下行起点站（83路为例，是长清北路地铁站）： print(response[0].info.routes[1].names[0])
-    下行终点站（83路为例，是三林世博家园）： print(response[0].info.routes[1].names[len(response[0].info.routes[1].names) - 1)
+    上行起点站（83路为例，是三林世博家园）： ```print(response[0].info.routes[0].names[0])```
+    上行终点站（83路为例，是长清北路枢纽站）： ```print(response[0].info.routes[0].names[len(response[0].info.routes[0].names) - 1])```
+    下行起点站（83路为例，是长清北路地铁站）： ```print(response[0].info.routes[1].names[0])```
+    下行终点站（83路为例，是三林世博家园）： ```print(response[0].info.routes[1].names[len(response[0].info.routes[1].names) - 1)```
     
     上行（83路为例，三林世博家园发往长清北路枢纽站），所有站点代码如下：
-    for name in response[0].info.routes[0].names:
+    ```for name in response[0].info.routes[0].names:
         print(name)
+    ```
     下行（83路为例，长清北路枢纽站发往三林世博家园），所有站点代码如下：
-    for name in response[0].info.routes[1].names:
+    ```for name in response[0].info.routes[1].names:
         print(name)
+    ```
    
     上行首班车，末班车，下行首班车，末班车代码如下：
-    print(response[0].info.routes[0].time.early)
+    ```print(response[0].info.routes[0].time.early)
     print(response[0].info.routes[0].time.late)
     print(response[0].info.routes[1].time.early)
     print(response[0].info.routes[1].time.late)
     6:00
     20:30
     6:30
-    21:00
+    21:00```
 
 ### 实时公交查询
 
